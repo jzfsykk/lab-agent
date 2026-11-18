@@ -7,10 +7,23 @@ venv/
 .mypy_cache/
 .ruff_cache/
 
+# ---------- 上传的文件（头像等，不进仓库） ----------
+backend/uploads/
+
+# ---------- 向量库 / 本地向量模型（本地生成，不进仓库） ----------
+backend/data/chroma/
+backend/data/models/
+
+# ---------- 参考资料（含截图，体积较大，仅本地保留） ----------
+docs/notes/
+
 # ---------- 敏感配置 ----------
+# 任何位置的 env 文件一律排除，只放行模板
+.env
+.env.*
 backend/.env
-.env.local
-.env.*.local
+!.env.example
+!**/.env.example
 
 # ---------- 前端 ----------
 node_modules/
@@ -29,3 +42,10 @@ dist-ssr/
 .DS_Store
 Thumbs.db
 *.log
+*.err
+
+# ---------- 本地草稿与一次性脚本 ----------
+docs/PROGRESS.md
+docs/项目图解.md
+scripts/_probe*
+scripts/mem_probe*.py
