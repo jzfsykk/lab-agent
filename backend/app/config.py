@@ -4,6 +4,25 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent  # 后端项目的根路径
 
+# ===== 文件上传配置 =====
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
+UPLOAD_DIR = BASE_DIR / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+ALLOWED_EXTENSIONS = {
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".gif",
+    ".webp",
+    ".pdf",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".zip",
+}
+
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -11,6 +30,11 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_HOURS: int = 24
+
+    # ===== 大模型配置 =====
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = "https://api.agnes-ai.cn/v1"
+    LLM_MODEL: str = "agnes-2.5-flash"
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env", env_file_encoding="utf-8"

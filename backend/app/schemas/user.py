@@ -6,8 +6,34 @@ class UserResponse(BaseModel):
     username: str
     name: str
     role: str
-    phone: str | None = None
     email: str | None = None
+    phone: str | None = None
+    avatar: str | None = None
     status: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdateRequest(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    avatar: str | None = None
+    role: str | None = None
+    status: int | None = None
+
+
+class UserCreateRequest(BaseModel):
+    username: str
+    password: str = "123"
+    name: str | None = None
+    email: str | None = None
+    phone: str | None = None
+    avatar: str | None = None
+    role: str = "student"
+    status: int = 1
+
+
+class PasswordUpdateRequest(BaseModel):
+    old_password: str
+    new_password: str

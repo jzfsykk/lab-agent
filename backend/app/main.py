@@ -1,5 +1,10 @@
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api import api
@@ -10,12 +15,33 @@ from app.common.exceptions import (
     http_excpetion_hadler,
     validation_excpetion_hadler,
 )
+from app.config import UPLOAD_DIR
 from app.database import Base, engine
+from app.models.equipment import Equipment
+from app.models.lab import Lab
+from app.models.reservation import Reservation
 from app.models.user import User
+from app.services import kb_service, reservation_service
+
+logger = logging.getLogger(__name__)
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 预热向量库：模型加载（首次约 15s+）挪到启动阶段，避免首个请求超时
+    try:
+        await asyncio.to_thread(kb_service.warmup)  # to_thread：别阻塞事件循环
+    except Exception:
+        logger.exception("向量库预热失败，服务继续启动")
+    # 启动项目时拉起异步扫描任务（过期的待审核预约自动取消）
+    task = asyncio.create_task(reservation_service.run_expire_scan())
+    yield
+    task.cancel()  # 关闭项目时同时取消异步任务
+
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:5173",
@@ -31,6 +57,9 @@ app.add_middleware(
 )
 
 app.include_router(api)
+
+# 挂载静态资源：/uploads/xxx.jpg → uploads/xxx.jpg
+app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # 注册异常处理器
 app.add_exception_handler(BusinessException, bussiness_excpetion_hadler)

@@ -5,3 +5,24 @@ pymysql==1.1.1
 pydantic-settings==2.7.1
 bcrypt==5.0.0
 PyJWT==2.13.0
+
+# 第 10 讲：文件上传
+python-multipart==0.0.32
+
+# 第 16 讲：pymysql 连接 MySQL 8 的 caching_sha2_password 需要
+cryptography==50.0.2
+
+# 第 20 讲：大模型（OpenAI 兼容接口，本课接 Agnes）
+openai==3.14.1
+
+# 第 22 讲：RAG 知识库（ChromaDB + 本地中文向量模型）
+chromadb==1.5.9
+sentence-transformers==6.0.1
+
+# 第 24 讲：LangGraph Agent
+langgraph==1.2.11
+langchain-openai==1.6.2
+langchain-core==1.6.3
+
+# 可选：从 ModelScope 预下载 bge 向量模型（国内比 HuggingFace 快很多）
+# modelscope
