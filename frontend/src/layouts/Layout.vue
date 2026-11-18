@@ -15,27 +15,63 @@
           <img style="width: 40px" src="@/assets/imgs/logo.png" alt="" />
           <div style="margin-left: 5px">智能实验室预约系统</div>
         </div>
-        <div style="display: flex; align-items: center">
-          <img src="@/assets/imgs/logo.png" alt="" style="width: 30px; border-radius: 50%" />
-          <div style="margin-left: 3px">管理员</div>
-        </div>
+        <el-dropdown @command="handleCommand">
+          <div style="display: flex; align-items: center; cursor: pointer">
+            <img
+              v-if="userInfo?.avatar"
+              :src="userInfo.avatar"
+              alt=""
+              style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover"
+            />
+            <img
+              v-else
+              src="@/assets/imgs/logo.png"
+              alt=""
+              style="width: 30px; height: 30px; border-radius: 50%"
+            />
+            <div style="margin-left: 3px">{{ userInfo?.name || '未登录' }}</div>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="profile">个人信息</el-dropdown-item>
+              <el-dropdown-item command="password">修改密码</el-dropdown-item>
+              <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </el-header>
       <el-container>
         <el-aside width="220px">
-          <el-menu router style="height: 100%" default-active="/manager/home">
+          <el-menu router style="height: 100%" :default-active="$route.path">
             <el-menu-item index="/manager/home">
               <el-icon><icon-menu /></el-icon>
               <span>系统首页</span>
             </el-menu-item>
-            <el-menu-item index="/manager/lab">
+            <el-menu-item index="/manager/lablist">
+              <el-icon><OfficeBuilding /></el-icon>
+              <span>实验室列表</span>
+            </el-menu-item>
+            <el-menu-item v-if="userInfo?.role === 'student'" index="/manager/my-reservation">
+              <el-icon><Tickets /></el-icon>
+              <span>我的预约</span>
+            </el-menu-item>
+            <el-menu-item v-if="userInfo?.role === 'admin'" index="/manager/audit-reservation">
+              <el-icon><DocumentChecked /></el-icon>
+              <span>预约审核</span>
+            </el-menu-item>
+            <el-menu-item index="/manager/ai-chat">
+              <el-icon><ChatDotRound /></el-icon>
+              <span>AI智能助手</span>
+            </el-menu-item>
+            <el-menu-item v-if="userInfo?.role === 'admin'" index="/manager/lab">
               <el-icon><House /></el-icon>
               <span>实验室管理</span>
             </el-menu-item>
-            <el-menu-item index="/manager/equ">
+            <el-menu-item v-if="userInfo?.role === 'admin'" index="/manager/equipment">
               <el-icon><Setting /></el-icon>
               <span>设备列表管理</span>
             </el-menu-item>
-            <el-menu-item index="/manager/user">
+            <el-menu-item v-if="userInfo?.role === 'admin'" index="/manager/user">
               <el-icon><User /></el-icon>
               <span>用户管理</span>
             </el-menu-item>
@@ -50,5 +86,30 @@
 </template>
 
 <script setup>
-import { Menu as IconMenu, House, Setting, User } from '@element-plus/icons-vue'
+import {
+  Menu as IconMenu,
+  House,
+  Setting,
+  User,
+  OfficeBuilding,
+  Tickets,
+  DocumentChecked,
+  ChatDotRound
+} from '@element-plus/icons-vue'
+import { useUser } from '@/utils/user'
+import { logout } from '@/utils/auth'
+import router from '@/router'
+
+const { userInfo } = useUser()
+
+const handleCommand = (command) => {
+  if (command === 'profile') {
+    router.push('/manager/profile')
+  } else if (command === 'password') {
+    router.push('/manager/password')
+  } else if (command === 'logout') {
+    logout()
+    router.push('/login')
+  }
+}
 </script>
